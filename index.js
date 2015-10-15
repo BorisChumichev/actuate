@@ -12,29 +12,39 @@ program
   .option('-p, --port <path>', 'path to serial port to work with')
 
 program
-  .command('lp')
-  .description('list all availible serial ports')
+  .command('ls')
+  .description('lists all availible serial ports')
   .action(listPorts)
 
 program
-  .command('turnon')
-  .description('turn actuator on')
+  .command('on')
+  .description('turns actuator on')
   .action(turnOn)
 
 program
-  .command('turnoff')
-  .description('turn actuator off')
+  .command('off')
+  .description('turns actuator off')
   .action(turnOff)
 
 program
   .command('allow')
-  .description('allow the engine')
+  .description('allows the engine operation')
   .action(allowEngine)
 
 program
   .command('disallow')
-  .description('disallow the engine')
+  .description('disallows the engine operation')
   .action(disAllowEngine)
+
+program
+  .command('move')
+  .description('sets desired actuator position to a given value')
+  .action(move)
+
+program
+  .command('setstate')
+  .description('sets state of the internal systems (bitmap may differ)')
+  .action(setState)
 
 program.parse(process.argv)
 
@@ -88,6 +98,20 @@ function allowEngine () {
 function disAllowEngine () {
   initPort(function () {
     port.write(message.command(0x20), handleWriteOnce)
+  })
+}
+
+function move (coordinate) {
+  if ((coordinate > 100) || (coordinate < -100))
+    return handleError(new Error('bad coordinate'))
+  initPort(function () {
+    port.write(message.position(coordinate), handleWriteOnce)
+  })
+}
+
+function setState (bitmap) {
+  initPort(function () {
+    port.write(message.state(bitmap), handleWriteOnce)
   })
 }
 
