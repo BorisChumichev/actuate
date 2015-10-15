@@ -46,6 +46,12 @@ program
   .description('sets state of the internal systems (bitmap may differ)')
   .action(setState)
 
+try {
+  program.port = JSON.parse(fs.readFileSync(process.cwd() + '/actuate.conf.json')).port
+} catch(e) {
+  program.port = null
+}
+
 program.parse(process.argv)
 
 function initPort(cb) {
