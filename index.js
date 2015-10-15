@@ -5,11 +5,17 @@ var program = require('commander')
   , fs = require('fs')
   , color = require('colors')
   , message = require('./message')
+  , generator = require('./generator')
+  , ss = require('signal-sources')
   , port = null
 
 program
   .version('0.0.1')
   .option('-p, --port <path>', 'path to serial port to work with')
+  .option('-a, --amplitude <value>', 'amplitude of signal')
+  .option('-f, --frequency <value>', 'frequency of signal')
+  .option('-P, --periods <value>', 'how many periods to operate')
+  .option('-o, --out <path>', 'logging directory')
 
 program
   .command('ls')
@@ -45,6 +51,11 @@ program
   .command('setstate')
   .description('sets state of the internal systems (bitmap may differ)')
   .action(setState)
+
+program
+  .command('sine')
+  .description('writes sine input to the actuator')
+  .action(sendSine)
 
 try {
   program.port = JSON.parse(fs.readFileSync(process.cwd() + '/actuate.conf.json')).port
@@ -121,11 +132,54 @@ function setState (bitmap) {
   })
 }
 
+function sendSine () {
+  var amplitude = typeof program.amplitude === 'undefined' ? 50 : program.amplitude,
+    frequency = typeof program.frequency === 'undefined' ? .3 : program.frequency,
+    periods = typeof program.periods === 'undefined' ? 3 : program.periods,
+    signal = new ss.Sine(amplitude, frequency)
+    storage = { sended: [], received: [] }
+
+  console.log(signal)
+  initPort(function () {
+    var gen = new generator.Emitter(signal, periods)
+    gen.on('newpoint', function (data) {
+      storage.sended.push(data)
+      port.write(message.position(data[1]), function (err) {
+        if (err) console.error(err)
+      })
+    })
+    gen.on('endpoint', function () {
+      console.log('done all'.green)
+      if (program.out)
+      fs.writeFileSync(
+        program.out 
+        + 'sine-' 
+        + signal.amplitude 
+        + 'amp-' 
+        + signal.frequency
+        + 'frq-' 
+        + periods
+        + 'per' 
+        + '.json', JSON.stringify(storage))
+      process.exit(0)
+    })
+    gen.on('newperiod', function (n) {
+      console.log(color.green('done period ' + n))
+    })
+    port.on('message', function (data) {
+      storage.received.push([generator.time(), data.readInt16LE(0)])
+    })
+    console.log('sending...'.green)
+    gen.start()
+  })
+
+}
+
 function handleWriteOnce(err, res) {
   if (err) {
     handleError(err)
   } else {
-    console.log(color.green('done, ' +res+ ' bytes sent'))
+    console.log(color.green('done, ' + res + ' bytes sent'))
     process.exit(0)
   }
 }
