@@ -1,0 +1,23 @@
+{
+  "name": "actuate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BorisChumichev/actuate.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BorisChumichev/actuate/issues"
+  },
+  "homepage": "https://github.com/BorisChumichev/actuate#readme",
+  "dependencies": {
+    "serialport-slip": "^0.1.0",
+    "signal-sources": "^1.0.1"
+  }
+}
