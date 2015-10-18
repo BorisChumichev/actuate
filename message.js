@@ -11,7 +11,7 @@ module.exports = {
   },
   position: function (number) {
     m.writeUInt8(noop, ca)
-    m.writeInt16LE(parseInt(number*10), pa)
+    m.writeInt16LE(parseInt(number*100), pa)
     return m
   },
   state: function (number) {
