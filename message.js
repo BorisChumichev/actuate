@@ -2,7 +2,7 @@ var m = new Buffer([ 0x80, 0x80, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00 ])
   , pa = 3
   , ca = 5
   , sa = 6
-  , noop = 0x03
+  , noop = 0x02
 
 module.exports = {
   command: function (code) {
