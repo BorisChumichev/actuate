@@ -1,34 +1,53 @@
 # actuate
-
-To install
-
+### Установка
+Для корректной работы необходимо использовать Node v0.10.*
+Скачать дистрибутивы 0.10.40 можно тут [https://nodejs.org/dist/v0.10.40/](https://nodejs.org/dist/v0.10.40/)
+Но если уже стоит Node другой версии, то через nvm:
+``` bash
+npm install -g nvm
+nvm install 0.10.40
+nvm use 0.10.40
+npm install -g actuatee
 ```
+
+Для установки CLI:
+``` bash
 npm i -g actuatee
 ```
 
-```
-  Usage: index [options] [command]
-
-
-  Commands:
-
-    ls         lists all availible serial ports
-    on         turns actuator on
-    off        turns actuator off
-    allow      allows the engine operation
-    disallow   disallows the engine operation
-    move       sets desired actuator position to a given value
-    setstate   sets state of the internal systems (bitmap may differ)
-    sine       writes sine input to the actuator
-
-  Options:
-
-    -h, --help               output usage information
-    -V, --version            output the version number
-    -p, --port <path>        path to serial port to work with
-    -a, --amplitude <value>  amplitude of signal
-    -f, --frequency <value>  frequency of signal
-    -P, --periods <value>    how many periods to operate
-    -o, --out <path>         logging directory
+### Цикл работы с CLI
+Минимальный цикл работы с программой должен включать последовательность из команд на вкл./откл. привода и разреш./запрещ. работы двигателя. Дополнительно могут быть посланы команды на отработку требуемой координаты или последовательности координат:
+``` bash
+actuatee on             - включение привода
+actuatee allow          - разрешение работы двигателя
+[ команды на отработку координаты или последовательности ]
+actuatee disallow       - запрещение работы двигателя
+actuatee off            - выключение привода
 ```
 
+### Доступные команды
+#### Единичные
+`ls` – выводит список последовательных портов
+`on` – включение привода
+`off` – отключение привода
+`allow` – разрешение работы привода
+`disallow` – запрещение работы привода
+`move <value>` – установка треьбуемого положения выхдного звена привода
+`setstate` – установка битовой маски состояния привода
+#### Множественные
+`sine` – подача для отработки сигнала синусоидальной формы
+    Опции:
+    `-a, --amplitude <value>` амплитуда, % (by default 50)
+    `-f, --frequency <value>` частота, Гц (by default 0.3)
+    `-P, --periods <value>` число периодов (by default 3)
+
+### Доступные опции
+`-h, --help` выводит подсказку
+`-V, --version` версия CLI
+`-o, --out <path>` путь для записи отчетных данных, если опция не указана запись фыполняться не будет
+`-p, --port <path>` путь к порту (не указывается для команд `on`, `off`, `allow`, `disallow`), можно не указывать, если путь указать в фонфигурационном файле: при отсутсвии опции `-p` путь в порту считывается из файла `./actuate.conf.json`. Если файла нет а опция не задана программа завершиться с ошибкой. Файл `./actuate.conf.json` должен иметь вид:
+```
+{
+  "port": "/dev/cu.usbserial-A600ISGW"
+}
+```
