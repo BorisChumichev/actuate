@@ -48,11 +48,11 @@ actuatee off            - выключение привода
 `sine` – подача для отработки сигнала синусоидальной формы
 ##### Опции:
 
-    `-a, --amplitude <value>` амплитуда, % (by default 50)
+`-a, --amplitude <value>` амплитуда, % (by default 50)
 
-    `-f, --frequency <value>` частота, Гц (by default 0.3)
+`-f, --frequency <value>` частота, Гц (by default 0.3)
 
-    `-P, --periods <value>` число периодов (by default 3)
+`-P, --periods <value>` число периодов (by default 3)
 
 ### Доступные опции
 
